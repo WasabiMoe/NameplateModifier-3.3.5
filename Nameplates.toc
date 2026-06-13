@@ -22,5 +22,6 @@ localization.zhTW.lua
 localization.koKR.lua
 
 Nameplates.lua
+debuffs.lua
 config.lua
 bindings.lua
