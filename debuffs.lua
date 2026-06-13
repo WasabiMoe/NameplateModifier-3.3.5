@@ -213,6 +213,17 @@ local function updateNameplate(frame, healthFrame)
     local plateName = getNameFromPlate(frame)
     local cache     = plateName and auraCache[plateName]
 
+    -- If cache is empty, try collecting right now if this plate matches target or mouseover
+    if not cache and plateName then
+        for _, unit in ipairs({ "target", "mouseover" }) do
+            if UnitExists(unit) and UnitName(unit) == plateName then
+                collectDebuffs(unit)
+                cache = auraCache[plateName]
+                break
+            end
+        end
+    end
+
     if not cache then
         for _, icon in ipairs(pool) do icon:Hide() end
         return
@@ -269,6 +280,10 @@ ticker:SetScript("OnUpdate", function(self, elapsed)
         return
     end
     elapsed_accum = 0
+
+    -- Always keep target and mouseover cache fresh so icons appear without waiting for events
+    collectDebuffs("target")
+    collectDebuffs("mouseover")
 
     for frame, pool in pairs(iconPools) do
         if frame:IsShown() then
