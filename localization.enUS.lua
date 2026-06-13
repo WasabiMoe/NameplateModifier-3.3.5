@@ -4,6 +4,14 @@ if not L then return end
 
 Nameplates.L = LibStub("AceLocale-3.0"):GetLocale("Nameplates")
 
+-- Status messages (used by bindings.lua)
+L["Enemy player/npc name plates are now visible."]    = true
+L["Enemy player/npc name plates are now hidden."]     = true
+L["Friendly player/npc name plates are now visible."] = true
+L["Friendly player/npc name plates are now hidden."]  = true
+L["All name plates are now visible."]                 = true
+L["All name plates are now hidden."]                  = true
+
 L["General"]                          = true
 L["Show nameplate visibility status"] = true
 L["Nameplates"]                       = true
