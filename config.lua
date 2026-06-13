@@ -10,22 +10,24 @@ function Config:OnInitialize()
     SML = LibStub("LibSharedMedia-3.0")
 
     -- Register bundled statusbar textures
-    SML:Register(SML.MediaType.STATUSBAR, "BantoBar",          "Interface\\Addons\\Nameplates\\images\\banto")
-    SML:Register(SML.MediaType.STATUSBAR, "Smooth",            "Interface\\Addons\\Nameplates\\images\\smooth")
-    SML:Register(SML.MediaType.STATUSBAR, "Perl",              "Interface\\Addons\\Nameplates\\images\\perl")
-    SML:Register(SML.MediaType.STATUSBAR, "Glaze",             "Interface\\Addons\\Nameplates\\images\\glaze")
-    SML:Register(SML.MediaType.STATUSBAR, "Charcoal",          "Interface\\Addons\\Nameplates\\images\\Charcoal")
-    SML:Register(SML.MediaType.STATUSBAR, "Otravi",            "Interface\\Addons\\Nameplates\\images\\otravi")
-    SML:Register(SML.MediaType.STATUSBAR, "Striped",           "Interface\\Addons\\Nameplates\\images\\striped")
-    SML:Register(SML.MediaType.STATUSBAR, "LiteStep",          "Interface\\Addons\\Nameplates\\images\\LiteStep")
-    SML:Register(SML.MediaType.STATUSBAR, "Nameplates Default","Interface\\TargetingFrame\\UI-TargetingFrame-BarFill")
+    SML:Register(SML.MediaType.STATUSBAR, "BantoBar",           "Interface\\Addons\\Nameplates\\images\\banto")
+    SML:Register(SML.MediaType.STATUSBAR, "Smooth",             "Interface\\Addons\\Nameplates\\images\\smooth")
+    SML:Register(SML.MediaType.STATUSBAR, "Perl",               "Interface\\Addons\\Nameplates\\images\\perl")
+    SML:Register(SML.MediaType.STATUSBAR, "Glaze",              "Interface\\Addons\\Nameplates\\images\\glaze")
+    SML:Register(SML.MediaType.STATUSBAR, "Charcoal",           "Interface\\Addons\\Nameplates\\images\\Charcoal")
+    SML:Register(SML.MediaType.STATUSBAR, "Otravi",             "Interface\\Addons\\Nameplates\\images\\otravi")
+    SML:Register(SML.MediaType.STATUSBAR, "Striped",            "Interface\\Addons\\Nameplates\\images\\striped")
+    SML:Register(SML.MediaType.STATUSBAR, "LiteStep",           "Interface\\Addons\\Nameplates\\images\\LiteStep")
+    SML:Register(SML.MediaType.STATUSBAR, "Nameplates Default", "Interface\\TargetingFrame\\UI-TargetingFrame-BarFill")
 
-    -- Store for slash command handler
     Config._aceConfig = config
     Config._aceDialog = dialog
 end
 
+------------------------------------------------------------------------
 -- Generic get/set for profile values
+------------------------------------------------------------------------
+
 local function set(info, value)
     local cat = info[1]
     if cat == "general" or cat == "nameplates" then
@@ -44,11 +46,9 @@ local function get(info)
     return Nameplates.db.profile[info.arg][info[#info]]
 end
 
--- Color get/set (values are stored as sub-table { r, g, b, a })
+-- Color stored as a sub-table { r, g, b, a } inside a profile sub-table (e.g. shadowColor)
 local function setColor(info, r, g, b, a)
-    local tbl = Nameplates.db.profile[info.arg]
-    local key = info[#info]
-    tbl[key] = { r = r, g = g, b = b, a = a }
+    Nameplates.db.profile[info.arg][info[#info]] = { r = r, g = g, b = b, a = a }
     Nameplates:Reload()
 end
 
@@ -57,7 +57,7 @@ local function getColor(info)
     return c.r, c.g, c.b, c.a
 end
 
--- Top-level color get/set (for values like healthBorderColor that live directly on profile)
+-- Color stored directly on profile (e.g. healthBorderColor)
 local function setTopColor(info, r, g, b, a)
     Nameplates.db.profile[info[#info]] = { r = r, g = g, b = b, a = a }
     Nameplates:Reload()
@@ -68,13 +68,28 @@ local function getTopColor(info)
     return c.r, c.g, c.b, c.a
 end
 
--- Number range get/set (shadow offset)
+-- Number range get/set for shadow offsets
 local function setNumber(info, value)
     Nameplates.db.profile[info.arg][info[#info]] = value
     Nameplates:Reload()
 end
 
--- SML lists
+-- Debuffs sub-table get/set
+local function setDebuff(info, value)
+    Nameplates.db.profile.debuffs[info[#info]] = value
+    Nameplates:Reload()
+end
+
+local function getDebuff(info)
+    return Nameplates.db.profile.debuffs[info[#info]]
+end
+
+
+
+------------------------------------------------------------------------
+-- SML list helpers
+------------------------------------------------------------------------
+
 local textures = {}
 function Config:GetTextures()
     for k in pairs(textures) do textures[k] = nil end
@@ -99,6 +114,10 @@ local fontBorders = {
     ["THICKOUTLINE"] = L["Thick outline"],
     ["MONOCHROME"]   = L["Monochrome"],
 }
+
+------------------------------------------------------------------------
+-- Reusable font + shadow option block
+------------------------------------------------------------------------
 
 local function loadTextSettings(group, key)
     group.args.font = {
@@ -173,6 +192,10 @@ local function loadTextSettings(group, key)
         },
     }
 end
+
+------------------------------------------------------------------------
+-- Build full options table
+------------------------------------------------------------------------
 
 local function loadOptions()
     options = {
@@ -314,20 +337,73 @@ local function loadOptions()
                 handler = Config,
                 args    = {},
             },
+
+            -- Debuffs tab
+            debuffs = {
+                order   = 5,
+                type    = "group",
+                name    = L["Debuffs"],
+                get     = getDebuff,
+                set     = setDebuff,
+                handler = Config,
+                args    = {
+                    settings = {
+                        order  = 1,
+                        type   = "group",
+                        inline = true,
+                        name   = L["Debuffs"],
+                        args   = {
+                            enabled = {
+                                order = 1,
+                                type  = "toggle",
+                                name  = L["Show debuffs"],
+                                desc  = L["Show debuffs cast by you above the nameplate health bar."],
+                                width = "full",
+                            },
+                            iconSize = {
+                                order = 2,
+                                type  = "range",
+                                name  = L["Icon size"],
+                                desc  = L["Size of each debuff icon in pixels."],
+                                min   = 8, max = 32, step = 1,
+                            },
+                            offsetX = {
+                                order = 3,
+                                type  = "range",
+                                name  = L["Icon offset X"],
+                                desc  = L["Horizontal offset of the debuff icons."],
+                                min   = -100, max = 100, step = 1,
+                            },
+                            offsetY = {
+                                order = 4,
+                                type  = "range",
+                                name  = L["Icon offset Y"],
+                                desc  = L["Vertical offset of the debuff icons."],
+                                min   = -100, max = 100, step = 1,
+                            },
+                        },
+                    },
+
+                },
+            },
         },
     }
 
     -- Inject font/shadow settings into the text tabs
-    loadTextSettings(options.args.text, "text")
-    loadTextSettings(options.args.name, "name")
-    loadTextSettings(options.args.level, "level")
+    loadTextSettings(options.args.text,    "text")
+    loadTextSettings(options.args.name,    "name")
+    loadTextSettings(options.args.level,   "level")
+    loadTextSettings(options.args.debuffs, "debuffs")
 
     -- AceDB profile tab
     options.args.profile       = LibStub("AceDBOptions-3.0"):GetOptionsTable(Nameplates.db)
-    options.args.profile.order = 5
+    options.args.profile.order = 6
 end
 
+------------------------------------------------------------------------
 -- Slash commands
+------------------------------------------------------------------------
+
 SLASH_NAMEPLATES1 = "/nameplates"
 SLASH_NAMEPLATES2 = "/np"
 SLASH_NAMEPLATES3 = "/nameplate"
@@ -342,7 +418,10 @@ SlashCmdList["NAMEPLATES"] = function(msg)
     Config._aceDialog:Open("Nameplates")
 end
 
--- Register with Blizzard Interface Options
+------------------------------------------------------------------------
+-- Blizzard Interface Options registration
+------------------------------------------------------------------------
+
 local blizFrame = CreateFrame("Frame", nil, InterfaceOptionsFrame)
 blizFrame:SetScript("OnShow", function(self)
     self:SetScript("OnShow", nil)
@@ -369,14 +448,17 @@ blizFrame:SetScript("OnShow", function(self)
     dialog:AddToBlizOptions("Nameplates-Profile", options.args.profile.name, "Nameplates")
 
     config:RegisterOptionsTable("Nameplates-Text",    options.args.text)
-    dialog:AddToBlizOptions("Nameplates-Text",    options.args.text.name,  "Nameplates")
+    dialog:AddToBlizOptions("Nameplates-Text",    options.args.text.name,    "Nameplates")
 
     config:RegisterOptionsTable("Nameplates-Level",   options.args.level)
-    dialog:AddToBlizOptions("Nameplates-Level",   options.args.level.name, "Nameplates")
+    dialog:AddToBlizOptions("Nameplates-Level",   options.args.level.name,   "Nameplates")
 
     config:RegisterOptionsTable("Nameplates-Name",    options.args.name)
-    dialog:AddToBlizOptions("Nameplates-Name",    options.args.name.name,  "Nameplates")
+    dialog:AddToBlizOptions("Nameplates-Name",    options.args.name.name,    "Nameplates")
 
     config:RegisterOptionsTable("Nameplates-General", options.args.general)
     dialog:AddToBlizOptions("Nameplates-General", options.args.general.name, "Nameplates")
+
+    config:RegisterOptionsTable("Nameplates-Debuffs", options.args.debuffs)
+    dialog:AddToBlizOptions("Nameplates-Debuffs", options.args.debuffs.name, "Nameplates")
 end)
