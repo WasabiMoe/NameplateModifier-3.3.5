@@ -12,20 +12,33 @@ local SML
 function Nameplates:OnInitialize()
     self.defaults = {
         profile = {
-            textureName          = "Nameplates Default",
-            bindings             = false,
-            hideHealth           = false,
-            hideCast             = false,
-            hideElite            = false,
-            hideUninterruptible  = false,
-            healthBorderColor    = { r = 1, g = 0.82, b = 0, a = 1 }, -- default gold
+            textureName         = "Nameplates Default",
+            bindings            = false,
+            hideHealth          = false,
+            hideCast            = false,
+            hideElite           = false,
+            hideUninterruptible = false,
+            healthBorderColor   = { r = 1, g = 0.82, b = 0, a = 1 },
+            debuffs = {
+                enabled       = true,
+                iconSize      = 16,
+                offsetX       = 0,
+                offsetY       = 2,
+                name          = "Friz Quadrata TT",
+                size          = 8,
+                border        = "OUTLINE",
+                shadowEnabled = false,
+                shadowColor   = { r = 0, g = 0, b = 0, a = 1 },
+                x             = 0,
+                y             = 0,
+            },
             name  = { name = "Friz Quadrata TT", size = 12, border = "",        shadowEnabled = false, shadowColor = { r = 0, g = 0, b = 0, a = 1 }, x = 0, y = 0 },
             level = { name = "Friz Quadrata TT", size = 11, border = "",        shadowEnabled = false, shadowColor = { r = 0, g = 0, b = 0, a = 1 }, x = 0, y = 0 },
             text  = { name = "Friz Quadrata TT", size = 8,  border = "OUTLINE", shadowEnabled = false, shadowColor = { r = 0, g = 0, b = 0, a = 1 }, x = 0, y = 0, healthType = "percent", castType = "crtmax" },
         },
     }
 
-    self.db = LibStub("AceDB-3.0"):New("NameplatesDB", self.defaults)
+    self.db       = LibStub("AceDB-3.0"):New("NameplatesDB", self.defaults)
     self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
 
     SML = LibStub("LibSharedMedia-3.0")
@@ -102,7 +115,7 @@ function Nameplates:OnShow(frame)
 end
 
 function Nameplates:HealthOnValueChanged(frame, value)
-    local maxValue = select(2, frame:GetMinMaxValues())
+    local maxValue   = select(2, frame:GetMinMaxValues())
     local healthType = self.db.profile.text.healthType
 
     if healthType == "minmax" then
@@ -129,9 +142,9 @@ function Nameplates:CastOnValueChanged(frame, value)
         return
     end
 
-    local elapsed = math.floor(((value - minValue) * 100) + 0.5) / 100
+    local elapsed   = math.floor(((value - minValue) * 100) + 0.5) / 100
     local remaining = maxValue - value + (value - minValue)
-    local castType = self.db.profile.text.castType
+    local castType  = self.db.profile.text.castType
 
     if castType == "crtmax" then
         frame.NPText:SetFormattedText("%.2f / %.2f", elapsed, remaining)
@@ -154,10 +167,11 @@ function Nameplates:CreateText(frame)
 end
 
 local function hookFrames(...)
-    local self = Nameplates
+    local self    = Nameplates
+    local Debuffs = Nameplates:GetModule("Debuffs")
 
     for i = 1, select("#", ...) do
-        local frame = select(i, ...)
+        local frame  = select(i, ...)
         local region = frame:GetRegions()
 
         if not frames[frame]
@@ -180,14 +194,17 @@ local function hookFrames(...)
             self:HookScript(cast, "OnValueChanged", "CastOnValueChanged")
             self:HookScript(cast, "OnShow", "OnShow")
             self:CastOnValueChanged(cast, cast:GetValue())
-            self:OnShow(cast)  -- was missing in original; was calling OnShow(health) twice instead
+            self:OnShow(cast)
+
+            -- Register with debuffs module
+            Debuffs:RegisterNameplate(frame, health)
         end
     end
 end
 
 local numChildren = -1
-local frame = CreateFrame("Frame")
-frame:SetScript("OnUpdate", function(self, elapsed)
+local scanFrame   = CreateFrame("Frame")
+scanFrame:SetScript("OnUpdate", function(self, elapsed)
     if WorldFrame:GetNumChildren() ~= numChildren then
         numChildren = WorldFrame:GetNumChildren()
         hookFrames(WorldFrame:GetChildren())
@@ -195,6 +212,8 @@ frame:SetScript("OnUpdate", function(self, elapsed)
 end)
 
 function Nameplates:Reload()
+    local Debuffs = self:GetModule("Debuffs")
+
     for frame in pairs(frames) do
         local health, cast = frame:GetChildren()
         self:OnShow(health)
@@ -202,6 +221,9 @@ function Nameplates:Reload()
         self:OnShow(cast)
         self:CastOnValueChanged(cast, cast:GetValue())
     end
+
+    -- Let the debuffs module re-create icons at the (possibly new) size
+    Debuffs:ReloadAll(frames)
 end
 
 function Nameplates:Print(msg)
