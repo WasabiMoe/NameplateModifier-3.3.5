@@ -1,65 +1,73 @@
 if( GetLocale() ~= "koKR" ) then
-	return
+    return
 end
 
 local Nameplates = select(2, ...)
+
 Nameplates.L = setmetatable({
-  -- Status
-	["Enemy player/npc name plates are now visible."] = "적대적 Player/NPC 이름표 표시.",
-	["Enemy player/npc name plates are now hidden."] = "적대적 Player/NPC 이름표 숨김.",
-	["Friendly player/npc name plates are now visible."] = "우호적 Player/NPC 이름표 표시.",
-	["Friendly player/npc name plates are now hidden."] = "우호적 Player/NPC 이름표 숨김.",
-	["All name plates are now visible."] = "모든 이름표 표시.",
-	["All name plates are now hidden."] = "모든 이름표 숨김.",
+    -- Status
+    ["Enemy player/npc name plates are now visible."]   = "적대적 Player/NPC 이름표 표시.",
+    ["Enemy player/npc name plates are now hidden."]    = "적대적 Player/NPC 이름표 숨김.",
+    ["Friendly player/npc name plates are now visible."]= "우호적 Player/NPC 이름표 표시.",
+    ["Friendly player/npc name plates are now hidden."] = "우호적 Player/NPC 이름표 숨김.",
+    ["All name plates are now visible."]                = "모든 이름표 표시.",
+    ["All name plates are now hidden."]                 = "모든 이름표 숨김.",
 
-	-- GUI 
-	["General"] = "일반",
-	["Bars"] = "Bars",
-	["Bar texture"] = "무늬 선택",
-	["Shadow"] = "그림자",
+    -- GUI
+    ["General"]                           = "일반",
+    ["Bars"]                              = "Bars",
+    ["Bar texture"]                       = "무늬 선택",
+    ["Shadow"]                            = "그림자",
+    ["Custom texture to use for health and cast bars in name plates."] = "이름표 체력바와 시전바에 사용자 정의 글꼴 사용.",
+    ["Name text"]                         = "이름",
+    ["Cast/Health text"]                  = "시전/체력",
+    ["Level text"]                        = "레벨",
+    ["Text"]                              = "글꼴",
+    ["Font name"]                         = "글꼴 선택",
+    ["Font size"]                         = "글자 크기",
+    ["Font border"]                       = "글자 테두리",
+    ["Health text display"]               = "체력바 표시 설정",
+    ["Cast text display"]                 = "시전바 표시 설정",
+    ["Style of display for health bar text."] = "체력바 글꼴 표시 스타일 설정.",
+    ["Style of display for cast bar text."]   = "시전바 글꼴 표시 스타일 설정.",
+    ["Outline"]                           = "외곽선",
+    ["Thick outline"]                     = "굵은 외곽선",
+    ["Monochrome"]                        = "단색",
+    ["Font"]                              = "글꼴",
+    ["Nameplates"]                        = "이름표",
+    ["Hide elite indicator"]              = "정예 표시 숨김.",
+    ["Min / Max"]                         = "최소 / 최대",
+    ["Deficit"]                           = "결손치",
+    ["Percent"]                           = "백분율",
+    ["None"]                              = "없음",
+    ["Current / Max"]                     = "현재값 / 최대값",
+    ["Current"]                           = "현재값",
+    ["Time left"]                         = "남은 시간",
+    ["Enable shadow"]                     = "그림자 사용",
+    ["Shadow color"]                      = "그림자 색",
+    ["Shadow offset X"]                   = "그림자 X축",
+    ["Shadow offset Y"]                   = "그림자 Y축",
+    ["Show nameplate visibility status"]  = "가시거리에 따른 이름표 보기",
+    ["Hide health bar border"]            = "체력바 테두리 숨김",
+    ["Hide cast bar border"]              = "시전바 테두리 숨김",
+    ["A UI reload is required to make the border show again."]          = "선택한 테두리 옵션을 보려면 재시작이 필요합니다.",
+    ["A UI reload is required to make the elite indicator show again."] = "선택한 정예 표시 옵션을 보려면 재시작이 필요합니다.",
+    ["A UI reload is required to make the cast shield indicator show again."] = "시전 방패 표시를 다시 보려면 재시작이 필요합니다.",
 
-	["Custom texture to use for health and cast bars in name plates."] = "이름표 체력바와 시전바에 사용자 정의 글꼴 사용.",
+    -- Health border color
+    ["Health border color"]               = "체력바 테두리 색상",
 
-	["Name text"] = "이름",
-	["Cast/Health text"] = "시전/체력",
-	["Level text"] = "레벨",
-	["Text"] = "글꼴",
-	["Font name"] = "글꼴 선택",
+    -- Hide cast uninterruptible shield
+    ["Hide cast uninterruptible shield"]  = "중단 불가 시전 방패 숨김",
 
-	["Font size"] = "글자 크기",
-	["Font border"] = "글자 테두리",
-
-	["Health text display"] = "체력바 표시 설정",
-	["Cast text display"] = "시전바 표시 설정",
-	["Style of display for health bar text."] = "체력바 글꼴 표시 스타일 설정.",
-	["Style of display for cast bar text."] = "시전바 글꼴 표시 스타일 설정.",
-
-	["Outline"] = "외곽선",
-	["Thick outline"] = "굵은 외곽선",
-	["Monochrome"] = "단색",
-
-	["Font"] = "글꼴",
-	["Nameplates"] = "이름표",
-	["Hide elite indicator"] = "정예 표시 숨김.",
-
-	["Min / Max"] = "최소 / 최대",
-	["Deficit"] = "결손치",
-	["Percent"] = "백분율",
-	["None"] = "없음",
-	["Current / Max"] = "현재값 / 최대값",
-	["Current"] = "현재값",
-	["Percent"] = "백분율",
-	["Time left"] = "남은 시간",
-
-	["Enable shadow"] = "그림자 사용",
-	["Shadow color"] = "그림자 색",
-	["Shadow offset X"] = "그림자 X축",
-	["Shadow offset Y"] = "그림자 Y축",
-
-	["Show nameplate visibility status"] = "가시거리에 따른 이름표 보기",
-	["Hide health bar border"] = "체력바 테두리 숨김",
-	["Hide cast bar border"] = "시전바 테두리 숨김",
-
-	["A UI reload is required to make the border show again."] = "선택한 테두리 옵션을 보려면 재시작이 필요합니다.",
-	["A UI reload is required to make the elite indicator show again."] = "선택한 정예 표시 옵션을 보려면 재시작이 필요합니다.",
+    -- Debuffs
+    ["Debuffs"]                           = "약화 효과",
+    ["Show debuffs"]                      = "약화 효과 표시",
+    ["Show debuffs cast by you above the nameplate health bar."] = "이름표 체력바 위에 내가 건 약화 효과 표시.",
+    ["Icon size"]                         = "아이콘 크기",
+    ["Size of each debuff icon in pixels."] = "각 약화 효과 아이콘의 픽셀 크기.",
+    ["Icon offset X"]                     = "아이콘 X 오프셋",
+    ["Horizontal offset of the debuff icons."] = "약화 효과 아이콘 가로 오프셋.",
+    ["Icon offset Y"]                     = "아이콘 Y 오프셋",
+    ["Vertical offset of the debuff icons."]   = "약화 효과 아이콘 세로 오프셋.",
 }, {__index = Nameplates.L})
