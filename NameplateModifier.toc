@@ -1,5 +1,5 @@
 ## Interface: 30300
-## Title: Nameplates Modifier
+## Title: Nameplate Modifier
 ## Notes: Allows you to do basic configuration to the default Blizzard nameplates
 ## Author: Shadowed, Extended by WasabiMoe
 ## SavedVariables: NameplatesDB
