@@ -17,9 +17,10 @@ A lightweight modifier for the default Blizzard nameplates in World of Warcraft 
 ## Installation
 
 1. Download or clone this repository
-2. Copy the `Nameplates` folder into `World of Warcraft/Interface/AddOns/`
-3. Restart the game or reload the UI (`/reload`)
-4. Enable the addon from the character select screen
+2. Copy the folder into `World of Warcraft/Interface/AddOns/`
+3. Rename the folder to `NameplateModifier`
+4. Restart the game or reload the UI (`/reload`)
+5. Enable the addon from the character select screen
 
 ## Usage
 
