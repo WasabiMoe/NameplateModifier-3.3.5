@@ -1,7 +1,7 @@
 ## Interface: 30300
 ## Title: Nameplates Modifier
 ## Notes: Allows you to do basic configuration to the default Blizzard nameplates
-## Author: Shadowed
+## Author: Shadowed, Extended by WasabiMoe
 ## SavedVariables: NameplatesDB
 
 libs\LibStub-1.0\LibStub-1.0.xml
