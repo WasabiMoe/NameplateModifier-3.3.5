@@ -93,8 +93,16 @@ end
 function Nameplates:OnShow(frame)
     local _, healthBorder, castBorder, castUninterruptible, _, _, nameText, levelText, _, _, mobIcon = frame:GetParent():GetRegions()
 
-    -- Health bar texture
+    -- Health/cast bar texture
+    -- NOTE: SetStatusBarTexture() can reset the bar's rendered fill to 0
+    -- on this client until SetValue() is called again. Since OnShow only
+    -- fires once per show transition (not on every value tick), skipping
+    -- this would leave the bar looking blank the first time it appears
+    -- (most noticeable on the first cast on a freshly shown cast bar).
+    -- We preserve and immediately reapply the current value to avoid that.
+    local currentValue = frame:GetValue()
     frame:SetStatusBarTexture(SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.textureName))
+    frame:SetValue(currentValue)
 
     -- Font strings
     self:SetupFontString(frame.NPText, "text")
